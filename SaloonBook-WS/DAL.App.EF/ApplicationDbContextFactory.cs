@@ -11,7 +11,7 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applicati
         var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
         // does not actually connect to db
 
-        optionsBuilder.UseNpgsql("Host=localhost:5445;Username=postgres;Password=postgres;Database=saloon-book");
+        optionsBuilder.UseNpgsql("Host=localhost:5445;Username=postgres;Password=postgres;Database=saloon-book-db");
         // does not actually connect to db
         //optionsBuilder.UseNpgsql("");
         return new ApplicationDbContext(optionsBuilder.Options);

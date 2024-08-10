@@ -1,12 +1,12 @@
-# Use the default .NET SDK base image which will automatically match your platform
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG TARGETARCH
+WORKDIR /source
 
-# Copy all necessary files for restore as distinct layers
+# Copy necessary files
 COPY *.props ./
 COPY *.sln ./
 
-# Copy all project files
+# Copy project files
 COPY BLL.Base/*.csproj ./BLL.Base/
 COPY DAL.Base/*.csproj ./DAL.Base/
 COPY DAL.EF.Base/*.csproj ./DAL.EF.Base/
@@ -27,7 +27,7 @@ COPY Tests/*.csproj ./Tests/
 COPY WebApp/*.csproj ./WebApp/
 
 # Restore dependencies
-RUN dotnet restore
+RUN dotnet restore -a $TARGETARCH
 
 # Copy the rest of the source files
 COPY BLL.Base/. ./BLL.Base/
@@ -50,10 +50,12 @@ COPY Tests/. ./Tests/
 COPY WebApp/. ./WebApp/
 
 # Build and publish the app
-RUN dotnet publish -c Release -o /app/publish
+RUN dotnet publish -a $TARGETARCH --no-restore -o /app
 
 # Final stage
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+EXPOSE 80
 WORKDIR /app
-COPY --from=build /app/publish .
+COPY --from=build /app .
+USER $APP_UID
 ENTRYPOINT ["dotnet", "WebApp.dll"]
