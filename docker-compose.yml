@@ -34,6 +34,19 @@ services:
       - "5445:5432"
     volumes:
       - saloonbook-db-postgres-volume:/var/lib/postgresql/data
+  
+  saloonbook-ui:
+    container_name: saloonbook-ui
+    platform: linux/arm64/v8
+    build:
+      context: ./SaloonBook-UI
+      dockerfile: Dockerfile
+    ports:
+      - "8000:3000"
+    depends_on:
+      - saloonbook-ws
+    
 
 volumes:
   saloonbook-db-postgres-volume:
+
